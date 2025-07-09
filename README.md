@@ -1,4 +1,11 @@
 
+# Sports Club Auction
+
+A web app for managing sports club auctions.
+
+## 🚀 Live Demo
+
+👉 [https://chhava-auction.netlify.app/](https://chhava-auction.netlify.app/)
 
 # Getting Started with Create React App
 
