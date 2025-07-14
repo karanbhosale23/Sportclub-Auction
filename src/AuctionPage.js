@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 function AuctionPage() {
     // Load from localStorage or use default
+    const basePrice = 100;
     const getInitialTeams = () => {
         const saved = localStorage.getItem('auctionTeams');
         if (saved) {
@@ -9,14 +10,14 @@ function AuctionPage() {
                 return JSON.parse(saved);
             } catch {
                 return [
-                    { name: 'Team A', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: 100 })), budget: 900 },
-                    { name: 'Team B', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: 100 })), budget: 900 },
+                    { name: 'Team A', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: basePrice })), budget: 900 },
+                    { name: 'Team B', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: basePrice })), budget: 900 },
                 ];
             }
         }
         return [
-            { name: 'Team A', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: 100 })), budget: 900 },
-            { name: 'Team B', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: 100 })), budget: 900 },
+            { name: 'Team A', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: basePrice })), budget: 900 },
+            { name: 'Team B', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: basePrice })), budget: 900 },
         ];
     };
     const [teams, setTeams] = useState(getInitialTeams);
@@ -53,18 +54,18 @@ function AuctionPage() {
     const handleAddBet = (e) => {
         e.preventDefault();
         const { teamIdx, player, price } = betForm;
-        if (!player.trim() || isNaN(price) || price < minPrice) return;
+        if (!player.trim() || isNaN(price) || price < basePrice) return;
         setTeams(teams => teams.map((t, i) => {
-            if (i === Number(teamIdx) && t.players.length < maxPlayers && t.budget >= price) {
+            if (i === Number(teamIdx) && t.players.length < maxPlayers && t.budget >= (price - basePrice)) {
                 return {
                     ...t,
                     players: [...t.players, { name: player.trim(), price: Number(price) }],
-                    budget: t.budget - Number(price),
+                    budget: t.budget - (Number(price) - basePrice),
                 };
             }
             return t;
         }));
-        setBetForm(f => ({ ...f, player: '', price: minPrice }));
+        setBetForm(f => ({ ...f, player: '', price: basePrice }));
     };
 
     // Team name editing
@@ -106,12 +107,12 @@ function AuctionPage() {
     const saveEditPlayer = () => {
         const { teamIdx, playerIdx, name, price } = editingPlayer;
         let finalPrice = Number(price);
-        if (teamIdx === null || playerIdx === null || !name.trim() || isNaN(finalPrice) || finalPrice < minPrice) finalPrice = minPrice;
+        if (teamIdx === null || playerIdx === null || !name.trim() || isNaN(finalPrice) || finalPrice < basePrice) finalPrice = basePrice;
         setTeams(teams => teams.map((t, i) => {
             if (i === teamIdx) {
-                // Calculate budget adjustment
+                // Calculate budget adjustment (only price above basePrice counts)
                 const oldPrice = t.players[playerIdx].price;
-                const newBudget = t.budget + oldPrice - finalPrice;
+                const newBudget = t.budget + (oldPrice - basePrice) - (finalPrice - basePrice);
                 if (newBudget < 0) return t; // Don't allow over budget
                 const newPlayers = t.players.map((p, idx) => idx === playerIdx ? { name: name.trim(), price: finalPrice } : p);
                 return { ...t, players: newPlayers, budget: newBudget };
@@ -126,15 +127,30 @@ function AuctionPage() {
         localStorage.setItem('auctionTeams', JSON.stringify(teams));
     }, [teams]);
 
+    // Add this style block at the top of the component (inside the component, before return)
+    const priceAlignStyle = `
+.player-price-align {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 48px;
+  max-width: 60px;
+  text-align: right;
+  height: 100%;
+  font-variant-numeric: tabular-nums;
+}
+`;
+
     return (
         <div className="auction-root">
+            <style>{priceAlignStyle}</style>
             <div className="auction-header">
                 <h1>Team Auction</h1>
                 <button className="clear-btn" onClick={() => {
                     if (window.confirm('Are you sure you want to clear all auction data?')) {
                         setTeams([
-                            { name: 'Team A', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: 100 })), budget: 900 },
-                            { name: 'Team B', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: 100 })), budget: 900 },
+                            { name: 'Team A', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: basePrice })), budget: 900 },
+                            { name: 'Team B', players: Array.from({ length: 11 }, (_, i) => ({ name: `player${i + 1}`, price: basePrice })), budget: 900 },
                         ]);
                         localStorage.removeItem('auctionTeams');
                     }
@@ -193,7 +209,7 @@ function AuctionPage() {
                                     ) : (
                                         <>
                                             <span className="player-name">{p.name}</span>
-                                            <span className="player-price">{p.price}</span>
+                                            <span className="player-price player-price-align">{p.price}</span>
                                             <button className="icon-btn edit-btn" onClick={() => startEditPlayer(i, idx, p)}>
                                                 <img src="/edit.svg" alt="Edit" />
                                             </button>

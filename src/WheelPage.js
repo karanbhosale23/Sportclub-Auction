@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Wheel } from 'react-custom-roulette';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // NOTE: Using react-wheel-of-prizes for reliable pointer alignment and segment display
 // The pointer is always at the top and the selected name will always match the pointer
@@ -13,6 +14,11 @@ function WheelPage({ wheels, setWheels }) {
     const [listCollapsed, setListCollapsed] = useState(false);
     const [bounce, setBounce] = useState(false);
     const wheelRef = useRef();
+
+    // Add a utility function for safe slicing
+    function safeSlice(arr, ...args) {
+        return Array.isArray(arr) ? arr.slice(...args) : [];
+    }
 
     // Modal close on Escape or click outside (must be before any early return)
     useEffect(() => {
@@ -28,6 +34,19 @@ function WheelPage({ wheels, setWheels }) {
             window.removeEventListener('mousedown', handleClick);
         };
     }, [modal.open]);
+
+    // Handle last player case: if only 1 player left, auto-sell and redirect
+    useEffect(() => {
+        if (wheel && Array.isArray(wheel.items) && wheel.items.length === 1) {
+            // Auto-sell the last player
+            setTimeout(() => {
+                setModal({ open: true, wheelIdx: idx });
+            }, 500);
+        }
+        if (wheel && Array.isArray(wheel.items) && wheel.items.length === 0) {
+            setTimeout(() => navigate('/'), 1200);
+        }
+    }, [wheel, navigate, idx]);
 
     if (idx === -1) return <div>Category not found</div>;
 
@@ -92,7 +111,7 @@ function WheelPage({ wheels, setWheels }) {
     const subtitle = `Pick your ${wheel.title}!`;
 
     // Use a yellow/black theme for the wheel segments
-    const wheelData = (wheel.items || []).map((item) => ({
+    const wheelData = Array.isArray(wheel.items) && wheel.items.length ? wheel.items.map((item) => ({
         option: item,
         style: {
             backgroundColor: '#ffd600',
@@ -108,7 +127,7 @@ function WheelPage({ wheels, setWheels }) {
             transform: 'rotate(0deg)', // always horizontal
         },
         tooltip: item,
-    }));
+    })) : [];
 
     return (
         <div className="container wheel-full">
@@ -206,27 +225,33 @@ function WheelPage({ wheels, setWheels }) {
                                     +
                                 </button>
                             </div>
-                            <div className="playerlist-listwrap">
-                                {wheel.items.length === 0 ? (
-                                    <span style={{ color: '#888' }}>No items</span>
-                                ) : (
+                            {Array.isArray(wheel.items) && wheel.items.length > 0 ? (
+                                <div className="playerlist-listwrap">
                                     <ul className="playerlist-list">
-                                        {(wheel.items || []).map((item, itemIdx) => (
-                                            <li key={itemIdx} className={`playerlist-item${wheel.selected === item ? ' selected' : ''}`}>
-                                                <span className="playerlist-dot"></span>
-                                                <span className="playerlist-name">{item}</span>
-                                                <button
-                                                    className="remove-btn"
-                                                    title="Remove item"
-                                                    onClick={() => handleRemoveItem(itemIdx)}
+                                        <AnimatePresence>
+                                            {wheel.items.map((item, itemIdx) => (
+                                                <motion.li
+                                                    key={itemIdx}
+                                                    className={`playerlist-item${wheel.selected === item ? ' selected' : ''}`}
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: -20 }}
                                                 >
-                                                    ❌
-                                                </button>
-                                            </li>
-                                        ))}
+                                                    <span className="playerlist-dot"></span>
+                                                    <span className="playerlist-name">{item}</span>
+                                                    <button
+                                                        className="remove-btn"
+                                                        title="Remove item"
+                                                        onClick={() => handleRemoveItem(itemIdx)}
+                                                    >
+                                                        ❌
+                                                    </button>
+                                                </motion.li>
+                                            ))}
+                                        </AnimatePresence>
                                     </ul>
-                                )}
-                            </div>
+                                </div>
+                            ) : null}
                         </div>
                     </div>
                 </div>
