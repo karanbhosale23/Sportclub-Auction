@@ -1,0 +1,183 @@
+/* --- Sell Player Modal Professional Modern UI --- */
+.sell-modal {
+  background: #232526;
+  color: #fff;
+  border-radius: 32px;
+  padding: 2.8rem 2.2rem 2.2rem 2.2rem;
+  width: 400px;
+  box-shadow: 0 0 40px 0 #ffd60077, 0 8px 48px 0 #000a, 0 2px 16px #ffd60044;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  position: relative;
+  animation: modalPopIn 0.35s cubic-bezier(.68,-0.55,.27,1.55);
+}
+@keyframes modalPopIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.sell-modal-title {
+  color: #bdbdbd;
+  font-size: 1.08rem;
+  text-align: center;
+  margin-bottom: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.sell-modal-player {
+  color: #ffd600;
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 2.2rem;
+  letter-spacing: 1.2px;
+  text-shadow: 0 2px 18px #ffd600, 0 1px 0 #000, 0 0 12px #ffd60099;
+  line-height: 1.1;
+}
+.sell-modal-team-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.4rem;
+  margin-bottom: 1.5rem;
+}
+.sell-modal-team-btn {
+  background: #23272a;
+  color: #fff;
+  padding: 0.8rem 2.3rem;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1.15rem;
+  border: 2.5px solid #444;
+  transition: background 0.18s, color 0.18s, border 0.18s, box-shadow 0.18s;
+  cursor: pointer;
+  box-shadow: 0 2px 8px 0 #0002;
+  margin: 0 0.1rem;
+  outline: none;
+}
+.sell-modal-team-btn.selected {
+  background: #ffd600;
+  color: #232526;
+  font-weight: 800;
+  border: 2.5px solid #ffd600;
+  box-shadow: 0 0 16px 0 #ffd60099;
+}
+.sell-modal-team-btn:hover:not(.selected), .sell-modal-team-btn:focus-visible:not(.selected) {
+  background: #ffe066;
+  color: #232526;
+  border: 2.5px solid #ffd600;
+}
+.sell-modal-bid-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.3rem;
+  margin-bottom: 2.2rem;
+}
+.sell-modal-bid-btn {
+  background: #18181b;
+  border: 2.5px solid #ffd600;
+  color: #ffd600;
+  font-size: 1.6rem;
+  font-weight: 700;
+  padding: 0.35rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px 0 #ffd60033;
+  outline: none;
+}
+.sell-modal-bid-btn:hover, .sell-modal-bid-btn:focus-visible {
+  background: #ffd600;
+  color: #232526;
+  box-shadow: 0 4px 16px 0 #ffd60055;
+}
+.sell-modal-bid-input {
+  background: #232526;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  width: 80px;
+  text-align: center;
+  border: 2.5px solid #ffd600;
+  border-radius: 12px;
+  padding: 0.5rem 0.7rem;
+  outline: none;
+  box-shadow: 0 1px 4px 0 #ffd60022;
+  transition: border 0.18s, box-shadow 0.18s;
+}
+.sell-modal-bid-input:focus {
+  border: 2.5px solid #ffe066;
+  box-shadow: 0 0 10px #ffd60099;
+}
+.sell-modal-action-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+  margin-top: 0.7rem;
+}
+.sell-modal-confirm-btn {
+  background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
+  color: #fff;
+  padding: 1.1rem 0;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.18rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 14px 0 #10b98133;
+  transition: opacity 0.18s, box-shadow 0.18s;
+  width: 100%;
+  letter-spacing: 0.6px;
+}
+.sell-modal-confirm-btn:hover, .sell-modal-confirm-btn:focus-visible {
+  opacity: 0.92;
+  box-shadow: 0 4px 28px 0 #10b98155;
+}
+.sell-modal-cancel-btn {
+  background: linear-gradient(90deg, #e53935 0%, #ff9800 100%);
+  color: #fff;
+  padding: 1.1rem 0;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.18rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 14px 0 #e5393533;
+  transition: opacity 0.18s, box-shadow 0.18s;
+  width: 100%;
+  letter-spacing: 0.6px;
+}
+.sell-modal-cancel-btn:hover, .sell-modal-cancel-btn:focus-visible {
+  opacity: 0.92;
+  box-shadow: 0 4px 28px 0 #e5393555;
+}
+@media (max-width: 600px) {
+  .sell-modal {
+    width: 98vw;
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+  }
+  .sell-modal-player {
+    font-size: 1.4rem;
+  }
+  .sell-modal-team-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+  }
+  .sell-modal-bid-row {
+    gap: 0.6rem;
+  }
+  .sell-modal-bid-btn {
+    padding: 0.2rem 0.8rem;
+    font-size: 1.1rem;
+  }
+  .sell-modal-bid-input {
+    width: 52px;
+    font-size: 1.05rem;
+  }
+  .sell-modal-action-row {
+    gap: 0.6rem;
+  }
+} 
