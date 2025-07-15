@@ -1,12 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-<<<<<<< HEAD
-function Home({ wheels, unsoldPlayers }) {
-=======
 function Home({ wheels }) {
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
     const navigate = useNavigate();
+    const [hiddenCategories, setHiddenCategories] = useState([]);
+    const [fadeOutCat, setFadeOutCat] = useState(null);
+
+    // Defensive: prevent .slice() or .map() errors
+    const safeWheels = Array.isArray(wheels) ? wheels : [];
+
+    useEffect(() => {
+        safeWheels.forEach(w => {
+            if (w.items && w.items.length === 0 && !hiddenCategories.includes(w.title.toLowerCase())) {
+                setFadeOutCat(w.title.toLowerCase());
+                setTimeout(() => {
+                    setHiddenCategories(h => [...h, w.title.toLowerCase()]);
+                    setFadeOutCat(null);
+                }, 400); // match fade duration
+            }
+        });
+    }, [safeWheels, hiddenCategories]);
+
+    // Find the Unsold Players wheel
+    const unsoldWheel = safeWheels.find(w => w.title === 'Unsold Players');
+    const hasUnsold = unsoldWheel && unsoldWheel.items && unsoldWheel.items.length > 0 && !hiddenCategories.includes('unsold players');
+
     return (
         <div className="container home-full">
             <img src="/Screenshot 2025-07-05 141537.png" alt="Chhava Sports Club Logo" className="club-logo" />
@@ -17,28 +35,34 @@ function Home({ wheels }) {
                 Auction
             </div>
             <div className="category-btn-row">
-                {wheels.map(w => (
-                    <button
-                        key={w.title}
-                        className={`category-btn ${w.title.toLowerCase()}`}
-                        onClick={() => navigate(`/${w.title.toLowerCase()}`)}
-                    >
-                        {w.title}
-                    </button>
-                ))}
+                {safeWheels.map(w => {
+                    const cat = w.title.toLowerCase();
+                    if (cat === 'unsold players') return null; // REMOVE the blue Unsold Players button
+                    if (hiddenCategories.includes(cat)) return null;
+                    return (
+                        <button
+                            key={w.title}
+                            className={`category-btn ${cat}${fadeOutCat === cat ? ' fade-out' : ''}`}
+                            onClick={() => navigate(`/${cat.replace(/\s+/g, '-')}`)}
+                        >
+                            {w.title}
+                        </button>
+                    );
+                })}
                 <button className="category-btn auction" onClick={() => navigate('/auction')}>Auction</button>
             </div>
-<<<<<<< HEAD
-            {unsoldPlayers && unsoldPlayers.length > 0 && (
+            {hasUnsold && (
                 <div style={{ marginTop: 32, textAlign: 'center' }}>
                     <h2 style={{ color: '#ffd600', fontFamily: 'Oswald, Arial Black, sans-serif', fontWeight: 700, fontSize: '2rem', marginBottom: 12 }}>Unsold Players</h2>
-                    <button className="category-btn" style={{ background: '#888', color: '#fff' }} onClick={() => navigate('/unsold')}>
+                    <button
+                        className={`category-btn${fadeOutCat === 'unsold players' ? ' fade-out' : ''}`}
+                        style={{ background: '#888', color: '#fff' }}
+                        onClick={() => navigate('/unsold-players')}
+                    >
                         Go to Unsold Wheel
                     </button>
                 </div>
             )}
-=======
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
         </div>
     );
 }

@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-<<<<<<< HEAD
 import { useTeamNames } from './TeamNamesContext';
-=======
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
 
 function AuctionPage() {
     // Load from localStorage or use default
@@ -31,10 +28,7 @@ function AuctionPage() {
     const priceInputRef = useRef(null);
     const maxPlayers = 11;
     const minPrice = 100;
-<<<<<<< HEAD
     const { setTeamNames } = useTeamNames();
-=======
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
 
     // Auto-focus and select price input when editing a player
     useEffect(() => {
@@ -81,15 +75,11 @@ function AuctionPage() {
         setEditTeamName(name);
     };
     const saveEditTeam = (idx) => {
-<<<<<<< HEAD
         setTeams(teams => {
             const newTeams = teams.map((t, i) => i === idx ? { ...t, name: editTeamName.trim() || t.name } : t);
             setTeamNames([newTeams[0].name, newTeams[1].name]);
             return newTeams;
         });
-=======
-        setTeams(teams => teams.map((t, i) => i === idx ? { ...t, name: editTeamName.trim() || t.name } : t));
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
         setEditingTeamIdx(null);
         setEditTeamName('');
     };
@@ -120,22 +110,15 @@ function AuctionPage() {
         }
     };
     const saveEditPlayer = () => {
-<<<<<<< HEAD
         const basePrice = 100;
         const { teamIdx, playerIdx, name, price } = editingPlayer;
         let finalPrice = Number(price);
         if (teamIdx === null || playerIdx === null || !name.trim() || isNaN(finalPrice) || finalPrice < basePrice) finalPrice = basePrice;
-=======
-        const { teamIdx, playerIdx, name, price } = editingPlayer;
-        let finalPrice = Number(price);
-        if (teamIdx === null || playerIdx === null || !name.trim() || isNaN(finalPrice) || finalPrice < minPrice) finalPrice = minPrice;
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
         setTeams(teams => teams.map((t, i) => {
             if (i === teamIdx) {
                 // Calculate budget adjustment
-                const oldPrice = t.players[playerIdx].price;
-<<<<<<< HEAD
                 let newBudget = t.budget;
+                const oldPrice = t.players[playerIdx].price;
                 // If player was at base price, only subtract extra
                 if (oldPrice === basePrice) {
                     const extraCost = finalPrice - basePrice;
@@ -144,9 +127,6 @@ function AuctionPage() {
                     // If player was already custom, adjust by difference
                     newBudget = t.budget + oldPrice - finalPrice;
                 }
-=======
-                const newBudget = t.budget + oldPrice - finalPrice;
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
                 if (newBudget < 0) return t; // Don't allow over budget
                 const newPlayers = t.players.map((p, idx) => idx === playerIdx ? { name: name.trim(), price: finalPrice } : p);
                 return { ...t, players: newPlayers, budget: newBudget };

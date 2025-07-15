@@ -5,10 +5,7 @@ import Home from './Home';
 import WheelPage from './WheelPage';
 import { Wheel } from 'react-custom-roulette';
 import './App.css';
-<<<<<<< HEAD
 import { TeamNamesProvider } from './TeamNamesContext';
-=======
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
 
 const defaultWheels = [
   {
@@ -29,33 +26,27 @@ const defaultWheels = [
     color: '#dc3545',
     items: ['Sujit', 'Tejas', 'Atharva', 'Vedant', 'Ishwar', 'DK', 'Patil', 'Himanshu'],
   },
+  {
+    id: 4,
+    title: 'Unsold Players',
+    color: '#888',
+    items: [],
+  },
 ];
 
 const App = () => {
   const [wheels, setWheels] = useState(defaultWheels.map(w => ({ ...w, input: '', mustSpin: false, prizeNumber: 0, spinning: false, selected: null })));
-<<<<<<< HEAD
-  const [unsoldPlayers, setUnsoldPlayers] = useState([]);
   return (
     <TeamNamesProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Home wheels={wheels} unsoldPlayers={unsoldPlayers} />} />
-          <Route path="/:category" element={<WheelPage wheels={wheels} setWheels={setWheels} unsoldPlayers={unsoldPlayers} setUnsoldPlayers={setUnsoldPlayers} />} />
-          <Route path="/unsold" element={<WheelPage wheels={[{ title: 'Unsold Players', color: '#888', items: unsoldPlayers }]} setWheels={w => setUnsoldPlayers(w[0].items)} unsoldPlayers={unsoldPlayers} setUnsoldPlayers={setUnsoldPlayers} isUnsoldWheel />} />
+          <Route path="/" element={<Home wheels={wheels} />} />
+          <Route path=":category" element={<WheelPage wheels={wheels} setWheels={setWheels} />} />
+          <Route path="/unsold-players" element={<WheelPage wheels={wheels} setWheels={setWheels} isUnsoldWheel />} />
           <Route path="/auction" element={<AuctionPage />} />
         </Routes>
       </Router>
     </TeamNamesProvider>
-=======
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home wheels={wheels} />} />
-        <Route path="/:category" element={<WheelPage wheels={wheels} setWheels={setWheels} />} />
-        <Route path="/auction" element={<AuctionPage />} />
-      </Routes>
-    </Router>
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
   );
 };
 

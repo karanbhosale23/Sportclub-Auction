@@ -1,35 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Wheel } from 'react-custom-roulette';
-<<<<<<< HEAD
 import { useTeamNames } from './TeamNamesContext';
-=======
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
 
 // NOTE: Using react-wheel-of-prizes for reliable pointer alignment and segment display
 // The pointer is always at the top and the selected name will always match the pointer
 
-<<<<<<< HEAD
-function WheelPage({ wheels, setWheels, unsoldPlayers = [], setUnsoldPlayers, isUnsoldWheel }) {
+function WheelPage({ wheels, setWheels, setUnsoldPlayers, isUnsoldWheel }) {
     const { category } = useParams();
     const navigate = useNavigate();
-    const idx = isUnsoldWheel ? 0 : wheels.findIndex(w => w.title.toLowerCase() === category);
-=======
-function WheelPage({ wheels, setWheels }) {
-    const { category } = useParams();
-    const navigate = useNavigate();
-    const idx = wheels.findIndex(w => w.title.toLowerCase() === category);
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
+    // Unified index logic for all wheels
+    const idx = wheels.findIndex(w => {
+        const match = isUnsoldWheel ? 'unsold players' : category?.toLowerCase();
+        return w?.title?.toLowerCase() === match;
+    });
     const [modal, setModal] = useState({ open: false, wheelIdx: idx });
     const [listCollapsed, setListCollapsed] = useState(false);
     const [bounce, setBounce] = useState(false);
     const wheelRef = useRef();
-<<<<<<< HEAD
     const isSpinningRef = useRef(false); // Prevent double spins
     const { teamNames } = useTeamNames();
     const [sellModal, setSellModal] = useState({ open: false, player: '', team: teamNames[0], price: 100 });
-=======
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
+    // Track fade-out for category button
+    const [fadeOut, setFadeOut] = useState(false);
 
     // Modal close on Escape or click outside (must be before any early return)
     useEffect(() => {
@@ -46,14 +39,42 @@ function WheelPage({ wheels, setWheels }) {
         };
     }, [modal.open]);
 
-    if (idx === -1) return <div>Category not found</div>;
+    // Redirect to home after fade-out if last player is sold
+    useEffect(() => {
+        if (fadeOut) {
+            const timeout = setTimeout(() => {
+                navigate('/');
+            }, 400); // match fade duration
+            return () => clearTimeout(timeout);
+        }
+    }, [fadeOut, navigate]);
+
+    if (!wheels || idx === -1 || !wheels[idx]?.items?.length) {
+        if (!fadeOut) {
+            setFadeOut(true);
+            setTimeout(() => navigate('/'), 400);
+        }
+        return null;
+    }
+
+    const wheel = wheels[idx];
 
     const handleInputChange = (value) => {
-        setWheels(wheels => wheels.map((w, i) => i === idx ? { ...w, input: value } : w));
+        setWheels(wheels => wheels.map((w, i) => {
+            if (!w || !w.items) {
+                console.warn('Wheel data is undefined or has no items.');
+                return w;
+            }
+            return i === idx ? { ...w, input: value } : w;
+        }));
     };
     const handleAddItem = () => {
         setWheels(wheels => wheels.map((w, i) => {
-            if (i === idx && w.input.trim()) {
+            if (!w || !w.items) {
+                console.warn('Wheel data is undefined or has no items.');
+                return w;
+            }
+            if (i === idx && w.input && w.input.trim()) {
                 if (!w.items.includes(w.input.trim())) {
                     return { ...w, items: [...w.items, w.input.trim()], input: '' };
                 }
@@ -62,18 +83,31 @@ function WheelPage({ wheels, setWheels }) {
         }));
     };
     const handleRemoveItem = (itemIdx) => {
-        setWheels(wheels => wheels.map((w, i) => i === idx ? { ...w, items: w.items.filter((_, j) => j !== itemIdx) } : w));
+        setWheels(wheels => wheels.map((w, i) => {
+            if (!w || !w.items) {
+                console.warn('Wheel data is undefined or has no items.');
+                return w;
+            }
+            return i === idx ? { ...w, items: w.items.filter((_, j) => j !== itemIdx) } : w;
+        }));
     };
     const playSound = (src) => {
         const audio = new window.Audio(src);
         audio.play();
     };
     const handleSpin = () => {
-<<<<<<< HEAD
-        if (wheels[idx].items.length > 0 && !wheels[idx].spinning && !isSpinningRef.current) {
+        if (!wheels || idx === -1 || !wheels[idx]?.items?.length) {
+            console.warn('Invalid wheel data for spinning.');
+            return;
+        }
+        if (wheels[idx]?.items?.length > 0 && !wheels[idx].spinning && !isSpinningRef.current) {
             isSpinningRef.current = true;
             playSound('/spin.mp3'); // Play spin sound
             setWheels(wheels => wheels.map((w, i) => {
+                if (!w || !w.items) {
+                    console.warn('Wheel data is undefined or has no items.');
+                    return w;
+                }
                 if (i === idx && w.items.length > 0 && !w.spinning) {
                     let rawPrize;
                     if (w.items.length === 1) {
@@ -92,25 +126,14 @@ function WheelPage({ wheels, setWheels }) {
     };
     const handleStopSpinning = () => {
         isSpinningRef.current = false; // Unlock spin
-=======
-        if (wheels[idx].items.length > 0 && !wheels[idx].spinning) {
-            playSound('/spin.mp3'); // Play spin sound
-        }
-        setWheels(wheels => wheels.map((w, i) => {
-            if (i === idx && w.items.length > 0 && !w.spinning) {
-                const rawPrize = Math.floor(Math.random() * w.items.length);
-                // Use rawPrize directly so the selected segment matches the pointer
-                return { ...w, mustSpin: true, prizeNumber: rawPrize, spinning: true, _rawPrize: rawPrize };
-            }
-            return w;
-        }));
-    };
-    const handleStopSpinning = () => {
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
         playSound('/win.mp3'); // Play win sound
         setBounce(true);
         setTimeout(() => setBounce(false), 600);
         setWheels(wheels => wheels.map((w, i) => {
+            if (!w || !w.items) {
+                console.warn('Wheel data is undefined or has no items.');
+                return w;
+            }
             if (i === idx) {
                 setTimeout(() => setModal({ open: true, wheelIdx: idx }), 300);
                 // Use the original random index for the selected name
@@ -122,16 +145,32 @@ function WheelPage({ wheels, setWheels }) {
     };
     const closeModal = () => setModal({ open: false, wheelIdx: null });
     const hideChoice = () => {
-<<<<<<< HEAD
-        if (isUnsoldWheel) {
-            // Remove from unsoldPlayers
-            setUnsoldPlayers(players => players.filter(p => p !== wheels[0].selected));
-            setWheels(ws => ws.map((w, i) => i === idx ? { ...w, selected: null } : w));
-        } else {
-            // Add to unsoldPlayers if not already present
-            setUnsoldPlayers(players => players.includes(wheels[idx].selected) || !wheels[idx].selected ? players : [...players, wheels[idx].selected]);
-            setWheels(ws => ws.map((w, i) => i === idx ? { ...w, items: w.items.filter(item => item !== w.selected), selected: null } : w));
-        }
+        setWheels(ws => {
+            // Remove from current wheel
+            let updated = ws.map((w, i) => {
+                if (!w || !w.items) return w;
+                if (i === idx) {
+                    const updatedItems = w.items.filter(item => item !== w.selected);
+                    if (updatedItems.length === 0) {
+                        setFadeOut(true);
+                        setTimeout(() => { }, 400);
+                    }
+                    return { ...w, items: updatedItems, selected: null };
+                }
+                return w;
+            });
+            // If not already in Unsold Players and not already present, add to Unsold Players wheel
+            const selectedPlayer = ws[idx]?.selected;
+            if (selectedPlayer) {
+                const unsoldIdx = ws.findIndex(w => w.title === 'Unsold Players');
+                if (unsoldIdx !== -1 && !ws[unsoldIdx].items.includes(selectedPlayer)) {
+                    updated = updated.map((w, i) =>
+                        i === unsoldIdx ? { ...w, items: [...w.items, selectedPlayer] } : w
+                    );
+                }
+            }
+            return updated;
+        });
     };
 
     // Add player to team in localStorage
@@ -162,36 +201,32 @@ function WheelPage({ wheels, setWheels }) {
             }
         }
         // Remove player from wheel
-        setWheels(wheels => wheels.map((w, i) => i === idx ? { ...w, items: w.items.filter(item => item !== player), selected: null } : w));
+        setWheels(wheels => wheels.map((w, i) => {
+            if (!w || !w.items) {
+                console.warn('Wheel data is undefined or has no items.');
+                return w;
+            }
+            if (i === idx) {
+                const updatedItems = w.items.filter(item => item !== player);
+                if (updatedItems.length === 0) {
+                    setFadeOut(true);
+                    setTimeout(() => { }, 400); // match fade duration
+                }
+                return { ...w, items: updatedItems, selected: null };
+            }
+            return w;
+        }));
         setSellModal({ open: false, player: '', team: teamNames[0], price: 100 });
         setModal({ open: false, wheelIdx: null });
     };
 
-    // Use wheels[idx] for normal, wheels[0] for unsold
-    const wheel = wheels[idx];
-    const subtitle = isUnsoldWheel ? 'Spin for Unsold Players!' : `Pick your ${wheel.title}!`;
-=======
-        setWheels(wheels => wheels.map((w, i) => {
-            if (i === idx) {
-                return { ...w, items: w.items.filter(item => item !== w.selected), selected: null };
-            }
-            return w;
-        }));
-    };
-
-    const wheel = wheels[idx];
     const subtitle = `Pick your ${wheel.title}!`;
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
 
     // Use a yellow/black theme for the wheel segments
     const wheelData = (wheel.items || []).map((item) => ({
         option: item,
         style: {
-<<<<<<< HEAD
-            backgroundColor: isUnsoldWheel ? '#888' : '#ffd600',
-=======
-            backgroundColor: '#ffd600',
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
+            backgroundColor: wheel.color || '#ffd600',
             color: '#232526',
             fontWeight: 900,
             fontSize: 22,
@@ -207,7 +242,7 @@ function WheelPage({ wheels, setWheels }) {
     }));
 
     return (
-        <div className="container wheel-full">
+        <div className={`container wheel-full${fadeOut ? ' fade-out' : ''}`}>
             <button className="back-btn" onClick={() => navigate('/')}>←</button>
             <div className="wheel-subtitle">{subtitle}</div>
             <div className="wheel-layout">
@@ -252,11 +287,7 @@ function WheelPage({ wheels, setWheels }) {
                             onStopSpinning={handleStopSpinning}
                             fontFamily="Montserrat, Arial, sans-serif"
                             fontSize={22}
-<<<<<<< HEAD
                             spinDuration={1.2}
-=======
-                            spinDuration={0.7}
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
                             radiusLineColor="#232526"
                             radiusLineWidth={4}
                             outerBorderColor="#232526"
@@ -340,7 +371,6 @@ function WheelPage({ wheels, setWheels }) {
                         <div className="modal-btn-row">
                             <button
                                 className="spin-button download-button secondary"
-<<<<<<< HEAD
                                 onClick={() => setSellModal({ open: true, player: wheel.selected, team: teamNames[0], price: 100 })}
                             >
                                 Sold To
@@ -348,48 +378,6 @@ function WheelPage({ wheels, setWheels }) {
                             <button
                                 className="spin-button download-button"
                                 onClick={hideChoice}
-=======
-                                onClick={hideChoice}
-                            >
-                                Hide Choice
-                            </button>
-                            <button
-                                className="spin-button download-button"
-                                onClick={() => {
-                                    // Add to Unsold wheel
-                                    setWheels(wheels => {
-                                        let unsoldIdx = wheels.findIndex(w => w.title === 'Unsold');
-                                        let updated = wheels.map((w, i) => {
-                                            if (i === idx) {
-                                                return { ...w, items: w.items.filter(item => item !== w.selected), selected: null };
-                                            }
-                                            return w;
-                                        });
-                                        if (unsoldIdx === -1) {
-                                            // Create Unsold wheel
-                                            updated.push({
-                                                id: wheels.length + 1,
-                                                title: 'Unsold',
-                                                color: '#9e9e9e',
-                                                items: [wheel.selected],
-                                                input: '',
-                                                mustSpin: false,
-                                                prizeNumber: 0,
-                                                spinning: false,
-                                                selected: null
-                                            });
-                                        } else {
-                                            // Add to existing Unsold wheel if not already present
-                                            updated = updated.map((w, i) => i === unsoldIdx && !w.items.includes(wheel.selected)
-                                                ? { ...w, items: [...w.items, wheel.selected] }
-                                                : w
-                                            );
-                                        }
-                                        return updated;
-                                    });
-                                    closeModal();
-                                }}
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
                             >
                                 Unsold
                             </button>
@@ -403,7 +391,6 @@ function WheelPage({ wheels, setWheels }) {
                     </div>
                 </div>
             )}
-<<<<<<< HEAD
             {/* Sell Modal */}
             {sellModal.open && (
                 <div className="modal-overlay flex items-center justify-center">
@@ -456,8 +443,6 @@ function WheelPage({ wheels, setWheels }) {
                     </div>
                 </div>
             )}
-=======
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
         </div>
     );
 }

@@ -3222,7 +3222,6 @@ body, .container, .wheel-full {
 }
 .player-price-input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
-<<<<<<< HEAD
 }
 
 /* --- Sell Player Modal Modern Styles --- */
@@ -3426,6 +3425,12 @@ body, .container, .wheel-full {
     width: 48vw;
     max-width: 98vw;
   }
-=======
->>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
 }
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+/* Optionally, for smoother removal, you can add display:none after transition ends with JS, but not needed for this use case. */
