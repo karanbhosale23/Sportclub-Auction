@@ -1,7 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+<<<<<<< HEAD
 function Home({ wheels, unsoldPlayers }) {
+=======
+function Home({ wheels }) {
+>>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
     const navigate = useNavigate();
     return (
         <div className="container home-full">
@@ -24,6 +28,7 @@ function Home({ wheels, unsoldPlayers }) {
                 ))}
                 <button className="category-btn auction" onClick={() => navigate('/auction')}>Auction</button>
             </div>
+<<<<<<< HEAD
             {unsoldPlayers && unsoldPlayers.length > 0 && (
                 <div style={{ marginTop: 32, textAlign: 'center' }}>
                     <h2 style={{ color: '#ffd600', fontFamily: 'Oswald, Arial Black, sans-serif', fontWeight: 700, fontSize: '2rem', marginBottom: 12 }}>Unsold Players</h2>
@@ -32,6 +37,8 @@ function Home({ wheels, unsoldPlayers }) {
                     </button>
                 </div>
             )}
+=======
+>>>>>>> 00af4e9123933443e54099f5de35934ea88fb7a4
         </div>
     );
 }
