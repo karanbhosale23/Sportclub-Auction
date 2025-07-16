@@ -24,6 +24,22 @@ function WheelPage({ wheels, setWheels, setUnsoldPlayers, isUnsoldWheel }) {
     // Track fade-out for category button
     const [fadeOut, setFadeOut] = useState(false);
 
+    // --- Add state for team budgets in Sell Modal (by teamNames) ---
+    const [teamBudgets, setTeamBudgets] = useState({});
+
+    // --- Update team budgets from localStorage when Sell Modal opens, using teamNames ---
+    useEffect(() => {
+        if (sellModal.open) {
+            const teams = JSON.parse(localStorage.getItem('auctionTeams')) || [];
+            const budgets = {};
+            if (teamNames && teamNames.length >= 2) {
+                budgets[teamNames[0]] = (teams.find(t => t.name === teamNames[0]) || {}).budget ?? 0;
+                budgets[teamNames[1]] = (teams.find(t => t.name === teamNames[1]) || {}).budget ?? 0;
+            }
+            setTeamBudgets(budgets);
+        }
+    }, [sellModal.open, teamNames]);
+
     // Modal close on Escape or click outside (must be before any early return)
     useEffect(() => {
         if (!modal.open) return;
@@ -397,19 +413,25 @@ function WheelPage({ wheels, setWheels, setUnsoldPlayers, isUnsoldWheel }) {
                     <div className="sell-modal">
                         <div className="sell-modal-title">Sell Player</div>
                         <div className="sell-modal-player">{sellModal.player}</div>
-                        <div className="sell-modal-team-row">
-                            <button
-                                className={`sell-modal-team-btn${sellModal.team === teamNames[0] ? ' selected' : ''}`}
-                                onClick={() => setSellModal(s => ({ ...s, team: teamNames[0] }))}
-                            >
-                                {teamNames[0]}
-                            </button>
-                            <button
-                                className={`sell-modal-team-btn${sellModal.team === teamNames[1] ? ' selected' : ''}`}
-                                onClick={() => setSellModal(s => ({ ...s, team: teamNames[1] }))}
-                            >
-                                {teamNames[1]}
-                            </button>
+                        <div className="sell-modal-team-row" style={{ position: 'relative', width: '100%', justifyContent: 'center', alignItems: 'center', gap: 18 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <button
+                                    className={`sell-modal-team-btn${sellModal.team === teamNames[0] ? ' selected' : ''}`}
+                                    onClick={() => setSellModal(s => ({ ...s, team: teamNames[0] }))}
+                                >
+                                    {teamNames[0]}
+                                </button>
+                                <span style={{ fontSize: 13, color: '#b8b8b8', marginTop: 4, fontWeight: 500, letterSpacing: 0.2 }}>{typeof teamBudgets[teamNames[0]] === 'number' ? `💰 ${teamBudgets[teamNames[0]]}` : ''}</span>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <button
+                                    className={`sell-modal-team-btn${sellModal.team === teamNames[1] ? ' selected' : ''}`}
+                                    onClick={() => setSellModal(s => ({ ...s, team: teamNames[1] }))}
+                                >
+                                    {teamNames[1]}
+                                </button>
+                                <span style={{ fontSize: 13, color: '#b8b8b8', marginTop: 4, fontWeight: 500, letterSpacing: 0.2 }}>{typeof teamBudgets[teamNames[1]] === 'number' ? `💰 ${teamBudgets[teamNames[1]]}` : ''}</span>
+                            </div>
                         </div>
                         <div className="sell-modal-bid-row">
                             <button className="sell-modal-bid-btn" onClick={() => setSellModal(s => ({ ...s, price: Math.max(0, s.price - (s.price > 200 ? 20 : 10)) }))}>-</button>
